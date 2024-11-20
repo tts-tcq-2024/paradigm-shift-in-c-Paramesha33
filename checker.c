@@ -1,35 +1,21 @@
-#include <stdio.h>
-#include <assert.h>
+#include "common_util.h"
+#include "battery_parameters_check.h"
+#include "checker.h"
 
-int Temperature(float temperature) {
-    if (temperature < 0 || temperature > 45) {
-        printf("Temperature out of range!\n");
-        return 0;
-    }
-    return 1;
-}
+int batteryIsOk(float temperature, float soc, float chargeRate)
+{
+  battery_status result1 = normal;
+  battery_status result2 = normal;
+  battery_status result3 = normal;
 
-int Soc(float soc) {
-    if (soc < 20 || soc > 80) {
-        printf("State of Charge out of range!\n");
-        return 0;
-    }
-    return 1;
-}
-int ChargeRate(float chargeRate) {
-    if (chargeRate > 0.8) {
-        printf("Charge Rate out of range!\n");
-        return 0;
-    }
-    return 1;
-}
+  result1 = battery_temperature_check(temperature,0.0,45.0);
+  message_logger("Temperature",temperature,result1);
 
+  result2 = battery_soc_check(soc,20.0,80.0) ;
+  message_logger("SOC",soc,result2);
 
-int batteryIsOk(float temperature, float soc, float chargeRate) {
-    return Temperature(temperature) && Soc(soc) && ChargeRate(chargeRate);
-}
+  result3 = battery_charge_rate(chargeRate,0.8);
+  message_logger("Charge Rate",chargeRate,result3);
 
-int main() {
-    assert(batteryIsOk(25, 70, 0.7));
-    assert(!batteryIsOk(50, 85, 0));
+  return result1 && result2 && result3;
 }
