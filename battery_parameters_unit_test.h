@@ -3,4 +3,4 @@
 
 void battery_parameters_testing(void);
 
-#endi
+#endif
